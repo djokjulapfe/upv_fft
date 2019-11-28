@@ -1,0 +1,24 @@
+|upv_fft
+a => mux:mux_1.a
+b => mux:mux_1.b
+c => mux:mux_1.c
+d => mux:mux_1.d
+s0 => mux:mux_1.s0
+s1 => mux:mux_1.s1
+x << mux:mux_1.x
+
+
+|upv_fft|mux:mux_1
+a => x.DATAB
+b => x.DATAB
+c => x.DATAB
+d => x.DATAA
+s0 => x.IN0
+s0 => x.IN0
+s0 => x.IN0
+s1 => x.IN1
+s1 => x.IN1
+s1 => x.IN1
+x <= x.DB_MAX_OUTPUT_PORT_TYPE
+
+
