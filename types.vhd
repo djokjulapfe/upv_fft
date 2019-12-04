@@ -8,4 +8,5 @@ package types is
 	type complex is record
 		r, i: integer;
 	end record;
+	type complex_vector is array (natural range <>) of complex;
 end package types;
