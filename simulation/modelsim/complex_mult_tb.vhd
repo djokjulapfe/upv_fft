@@ -18,7 +18,6 @@ architecture testbench of complex_mult_tb is
 
 
 	-- Testbench DUT ports
-	signal clk  : std_logic;
 	signal a, b : complex;
 	signal x    : complex;
 
@@ -26,16 +25,6 @@ architecture testbench of complex_mult_tb is
 	constant clk_period : time := 10 ns; -- NS
 
 begin
-	-----------------------------------------------------------
-	-- Clocks
-	-----------------------------------------------------------
-	clk_gen : process
-	begin
-		clk <= '1';
-		wait for clk_period / 2;
-		clk <= '0';
-		wait for clk_period / 2;
-	end process CLK_GEN;
 
 	-----------------------------------------------------------
 	-- Testbench Stimulus
@@ -45,6 +34,9 @@ begin
 	begin
 		a <= (r => 3, i => -4);
 		b <= (r => -2, i => 3);
+		wait for clk_period;
+		a <= (r => 1, i => 3);
+		b <= (r => 2, i => 4);
 		wait;
 	end process main;
 
@@ -53,7 +45,6 @@ begin
 	-----------------------------------------------------------
 	DUT : entity work.complex_mult
 		port map (
-			clk => clk,
 			a   => a,
 			b   => b,
 			x   => x
