@@ -3,6 +3,7 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 use work.types.all;
+use work.conversion.all;
 
 -----------------------------------------------------------
 
@@ -32,11 +33,11 @@ begin
 
     main : process
     begin
-        a <= (r => 3, i => -4);
-        b <= (r => -2, i => 3);
+        a <= pair2complex(3, -4);
+        b <= pair2complex(-2, 3);
         wait for clk_period;
-        a <= (r => 1, i => 3);
-        b <= (r => 2, i => 4);
+        a <= pair2complex(1, 3);
+        b <= pair2complex(2, 4);
         wait;
     end process main;
 
