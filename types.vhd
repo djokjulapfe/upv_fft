@@ -34,6 +34,12 @@ package types is
     function "+"(
             a, b : complex_double
         ) return complex_double;
+    function "-"(
+            a, b : complex
+        ) return complex;
+    function "-"(
+            a, b : complex_double
+        ) return complex_double;
     function "*"(
             a, b : complex
         ) return complex_double;
@@ -81,6 +87,26 @@ package body types is
             im => a.im + b.im
         );
     end function "+";
+
+    function "-"(
+            a, b : complex
+        ) return complex is
+    begin
+        return (
+            re => a.re - b.re,
+            im => a.im - b.im
+        );
+    end function "-";
+
+    function "-"(
+            a, b : complex_double
+        ) return complex_double is
+    begin
+        return (
+            re => a.re - b.re,
+            im => a.im - b.im
+        );
+    end function "-";
 
     function "*"(
             a, b : complex
