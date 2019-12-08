@@ -1,3 +1,13 @@
+--------------------------------------------------------------------------------
+-- Title       : FFTn testbench
+-- Project     : FFT
+-- File        : types.vhd
+-- Authors     : Djordje & Dusan
+-- Created     : Sun Dec  5
+-- Version     : 1.0
+-- Description : Testbench for rerouter
+-------------------------------------------------------------------------------
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;

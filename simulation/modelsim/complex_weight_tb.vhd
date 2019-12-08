@@ -1,3 +1,13 @@
+--------------------------------------------------------------------------------
+-- Title       : Complex weight testbench
+-- Project     : FFT
+-- File        : types.vhd
+-- Authors     : Djordje & Dusan
+-- Created     : Sun Dec  5
+-- Version     : 1.0
+-- Description : Testbench for Complex weight
+-------------------------------------------------------------------------------
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
