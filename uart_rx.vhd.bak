@@ -81,7 +81,7 @@ begin
             else
                 if sample_cnt = sample_cnt_max - 1 then
                     cnt_samples <= cnt_samples + 1;
-                    if cnt_samples = samples then
+                    if cnt_samples = samples - 1 then
                         cnt_samples <= 0;
                     end if;
                 end if;
@@ -118,7 +118,7 @@ begin
                 next_state <= IDLE;
             end if;
         when START =>
-            if cnt_samples = samples - 1 and sample_cnt = sample_cnt_max then
+            if cnt_samples = samples - 1 then
                 next_state <= RCV;
             else
                 next_state <= START;
