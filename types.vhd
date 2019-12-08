@@ -18,15 +18,6 @@ package types is
     --! Number of bits per word
     constant word_size : integer := 16;
 
-    --! Number of bits representing the sqrt constans #sqrt2, #sqrt2plus and #sqrt2minus
-    constant weight_precision : integer := 8;
-    --! 256 * sqrt(2) / 2
-    constant sqrt2 : signed(word_size - 1 downto 0) := to_signed(181, word_size);
-    --! 256 * sqrt(2 + sqrt(2)) / 2
-    constant sqrt2plus : signed(word_size - 1 downto 0) := to_signed(236, word_size);
-    --! 256 * sqrt(2 - sqrt(2)) / 2
-    constant sqrt2minus : signed(word_size - 1 downto 0) := to_signed(98, word_size);
-
     --! A type representing complex numbers with #word_size precision
     type complex is record
         --! Real part
@@ -92,19 +83,7 @@ package types is
     function "*"(
             a, b : complex
         ) return complex_double;
-
-    --! @brief Defines a mapping of indices to weight factors for rank 16 radix 2 fft.
-    --! @details @f[W(i) = W_{16}^i = e^{-2*i*pi/16}@f]
-    constant W : complex_vector(0 to 7) := (
-            (to_signed(256, word_size), to_signed(0, word_size)),
-            (sqrt2plus, -sqrt2minus),
-            (sqrt2, -sqrt2),
-            (sqrt2minus, -sqrt2plus),
-            (to_signed(0, word_size), -to_signed(256, word_size)),
-            (-sqrt2minus, -sqrt2plus),
-            (-sqrt2, -sqrt2),
-            (-sqrt2plus, -sqrt2minus)
-        );
+    
 end package types;
 
 package body types is
