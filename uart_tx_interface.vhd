@@ -29,7 +29,7 @@ end entity uart_tx_interface;
 
 architecture behavioral of uart_tx_interface is
     
-    type state_type is (IDLE, SEND_RE, SEND_IM, CLEANUP);
+    type state_type is (IDLE, SEND_RE, SEND_IM, UPDATE, CLEANUP);
     signal state_reg, next_state : state_type := IDLE;
     
     signal index            : integer range(0 to n);    -- tracks the index of fft_out

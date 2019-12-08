@@ -78,7 +78,7 @@ BEGIN
 	rx_in <= '0';
 	wait for 2064*clk_period; 
 
-	rx_in <= '1';
+	rx_in <= '0';
 	wait for 2064*clk_period + clk_period/10; 
 	rx_in <= '1';
 	wait for 2064*clk_period + clk_period/10;  

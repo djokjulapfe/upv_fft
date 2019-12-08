@@ -6,8 +6,9 @@ entity uart_rx is
     -- UART Receiver
     generic (
         -- n must be a number of two:
-        n               : integer := 16;    
-        sample_cnt_max  : integer := 163; 
+        n               : integer := 16;
+        samples         : integer := 16;
+        sample_cnt_max  : integer := 163        -- 50 MHz, 19200, 16 samples per bit 
     ); 
     
     port(
@@ -30,7 +31,7 @@ architecture behavioral of uart_rx is
     signal sample_cnt                   : integer := 0;
     signal cnt_samples                  : integer := 0;
     signal bits_cnt                     : integer := 0;
-    signal rx_reg , rx_reg_prev         : std_logic_vector(0 to n - 1);
+    signal rx_reg , rx_reg_prev         : std_logic_vector(0 to n - 1) := X"0000";
     signal rx_in_prev                   : std_logic;
     
 
@@ -57,7 +58,7 @@ begin
         if rising_edge(clk) then
             if (reset = '1') then
                 sample_cnt <= 0;
-            elsif (sample_cnt = sample_cnt_max + 1) then
+            elsif (sample_cnt = sample_cnt_max) then
                 sample_cnt <= 0;
             elsif state_reg = IDLE and next_state = START then
                 sample_cnt <= 0;
@@ -75,13 +76,14 @@ begin
         if(rising_edge(clk)) then
             if (reset = '1') then
                 cnt_samples <= 0;
-            elsif cnt_samples = samples - 1 then
-                cnt_samples <= 0;
             elsif state_reg = IDLE and next_state = START then
                 cnt_samples <= 0;
             else
-                if sample_cnt = sample_cnt_max then
+                if sample_cnt = sample_cnt_max - 1 then
                     cnt_samples <= cnt_samples + 1;
+                    if cnt_samples = samples - 1 then
+                        cnt_samples <= 0;
+                    end if;
                 end if;
             end if;
         end if;
@@ -98,7 +100,7 @@ begin
             elsif state_reg = IDLE and next_state = START then
                 bits_cnt <= 0;
             else
-                if cnt_samples = samples - 1 then
+                if cnt_samples = samples - 1 and sample_cnt = sample_cnt_max then
                     bits_cnt <= bits_cnt + 1;
                 end if;
             end if;
@@ -137,28 +139,25 @@ begin
         
     end process next_state_logic;
 
-    output_logic: process(state_reg, rx_reg_prev, cnt_samples, rx_in) is
+    output_logic: process(state_reg) is
     begin
         case state_reg is
         when IDLE =>
             rx_available <= '1';
-            rx_reg  <= rx_reg_prev;
-        when START =>
+        when others =>
             rx_available <= '0';
-            rx_reg <= rx_reg_prev;
-        when RCV =>
-            rx_available <= '0';
-            if cnt_samples = samples/2 then
-                rx_reg(bit_cnt) <= 
-            else
-                rx_reg <= rx_reg_prev;
-            end if;
-        when STOP =>
-            rx_available <= '0';
-            rx_reg <= rx_reg_prev;
         end case;
         
     end process output_logic;
     
+    rx_data: process(state_reg, rx_reg_prev, rx_reg, cnt_samples, bits_cnt, rx_in) is
+    begin
+        rx_reg <= rx_reg_prev;
+        if state_reg = RCV then
+            if (cnt_samples = samples/2) then
+                rx_reg(bits_cnt) <= rx_in;
+            end if;
+        end if;
+    end process rx_data;
     
 end behavioral;

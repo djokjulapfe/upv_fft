@@ -7,7 +7,7 @@ entity uart_tx is
     generic( 
         -- n must be a power of two
         n           : integer := 16;
-        baud_cnt_max: integer := 2504;      -- za 50MHz i baud rate 19200
+        baud_cnt_max: integer := 2504         -- za 50MHz i baud rate 19200
         );
         
     port(
