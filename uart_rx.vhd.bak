@@ -6,8 +6,10 @@ entity uart_rx is
     -- UART Receiver
     generic (
         -- n must be a number of two:
-        n               : integer := 16;    
-        sample_cnt_max  : integer := 163; 
+        n           : integer := 16;    
+        samples     : integer := 16;                            -- determines number of samples per bit
+        baud_rate   : integer := 19200;
+        freq        : integer := 50000000
     ); 
     
     port(
@@ -30,7 +32,7 @@ architecture behavioral of uart_rx is
     signal sample_cnt                   : integer := 0;
     signal cnt_samples                  : integer := 0;
     signal bits_cnt                     : integer := 0;
-    signal rx_reg , rx_reg_prev         : std_logic_vector(0 to n - 1);
+    signal rx_reg , rx_reg_prev         : std_logic_vector(0 to n - 1) <= (others => 0);
     signal rx_in_prev                   : std_logic;
     
 
@@ -57,7 +59,7 @@ begin
         if rising_edge(clk) then
             if (reset = '1') then
                 sample_cnt <= 0;
-            elsif (sample_cnt = sample_cnt_max + 1) then
+            elsif (sample_cnt = freq/(baud_rate*samples) + 1) then
                 sample_cnt <= 0;
             elsif state_reg = IDLE and next_state = START then
                 sample_cnt <= 0;
@@ -80,7 +82,7 @@ begin
             elsif state_reg = IDLE and next_state = START then
                 cnt_samples <= 0;
             else
-                if sample_cnt = sample_cnt_max then
+                if sample_cnt = freq/(baud_rate*samples) then
                     cnt_samples <= cnt_samples + 1;
                 end if;
             end if;
@@ -149,7 +151,8 @@ begin
         when RCV =>
             rx_available <= '0';
             if cnt_samples = samples/2 then
-                rx_reg(bit_cnt) <= 
+                rx_reg(0 to n-2) <= rx_reg_prev(1 to n - 1);
+                rx_reg(n - 1) <= rx_in;
             else
                 rx_reg <= rx_reg_prev;
             end if;

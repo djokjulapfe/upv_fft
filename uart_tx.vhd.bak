@@ -7,7 +7,8 @@ entity uart_tx is
     generic( 
         -- n must be a power of two
         n           : integer := 16;
-        baud_cnt_max: integer := 2504;      -- za 50MHz i baud rate 19200
+        freq        : integer := 50000000;
+        baud_rate   : integer := 19200
         );
         
     port(
@@ -74,7 +75,7 @@ begin
                 baud_cnt <= 0;
             elsif (tx_start_prev = '0' and tx_start = '1') then
                 baud_cnt <= 0;
-            elsif (baud_cnt = baud_cnt_max) then
+            elsif (baud_cnt = freq/baud_rate) then
                 baud_cnt <= 0;
             else
                 baud_cnt <= baud_cnt + 1;
@@ -86,7 +87,7 @@ begin
     -- Process that creates baud_clk
     baud_clk_gen: process(baud_cnt) is
     begin
-        if (baud_cnt = baud_cnt_max - 1) then
+        if (baud_cnt = freq/baud_rate - 1) then
             baud_clk <= '1';
         else 
             baud_clk <= '0';
