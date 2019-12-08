@@ -24,6 +24,8 @@ entity fftn is
     port (
         --! Clock
         clk : in std_logic;
+        --! Reset
+        reset : in std_logic;
         --! Signal to be processed
         fft_in : in complex_vector(0 to n - 1);
         --! The spectrum calculated using FFT
@@ -45,10 +47,20 @@ architecture comb of fftn is
 
 begin
 
+    reset_logic : process (clk) is
+    begin
+        if rising_edge(clk) and reset = '1' then
+            fft_upper_half <= (others => pair2complex(0, 0));
+            fft_lower_half <= (others => pair2complex(0, 0));
+            mult_out <= (others => pair2complex(0, 0));
+            mid_buffer <= (others => pair2complex(0, 0));
+        end if;
+    end process reset_logic;
+
     -- Updates the #mid_buffer with new data
     update_buffer : process (clk) is
     begin
-        if rising_edge(clk) then
+        if rising_edge(clk) and reset = '0' then
             if n = 2 then
                 mid_buffer <= fft_in;
             else
@@ -61,7 +73,7 @@ begin
     -- Combines the #mid_buffer data to the final output of the fftn block
     cross_combine : process (clk) is
     begin
-        if rising_edge(clk) then
+        if rising_edge(clk) and reset = '0' then
             for i in 0 to n / 2 - 1 loop
                 fft_out(i)       <= mid_buffer(i) + mid_buffer(n / 2 + i);
                 fft_out(n/2 + i) <= mid_buffer(i) - mid_buffer(n / 2 + i);
