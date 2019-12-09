@@ -10,6 +10,7 @@ entity counter is
 	port (
 		clk      : in     std_logic;
 		reset    : in     std_logic;
+		step	 : in     std_logic;
 		value    : buffer integer range 0 to n;
 		finished : out    std_logic
 	);
@@ -23,11 +24,15 @@ begin
 		if rising_edge(clk) then
 			if reset = '1' then
 				value <= 0;
-			elsif value = n - 1 then
-				value <= 0;
-				finished <= '1';
+			elsif step = '1' then 
+				if value = n - 1 then
+					value <= 0;
+					finished <= '1';
+				else
+					value <= value + 1;
+					finished <= '0';
+				end if;
 			else
-				value <= value + 1;
 				finished <= '0';
 			end if;
 		end if;
