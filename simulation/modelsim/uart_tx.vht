@@ -18,7 +18,7 @@
 -- suit user's needs .Comments are provided in each section to help the user  
 -- fill out necessary details.                                                
 -- ***************************************************************************
--- Generated on "12/07/2019 22:50:05"
+-- Generated on "12/09/2019 23:21:26"
                                                             
 -- Vhdl Test Bench template for design  :  uart_tx
 -- 
@@ -31,12 +31,12 @@ USE ieee.std_logic_1164.all;
 ENTITY uart_tx_vhd_tst IS
 END uart_tx_vhd_tst;
 ARCHITECTURE uart_tx_arch OF uart_tx_vhd_tst IS
--- constants
-CONSTANT clk_period: time := 0.02 ns;                                                 
+-- constants 
+CONSTANT clk_period : time := 0.02 ns;                                                
 -- signals                                                   
 SIGNAL clk : STD_LOGIC;
 SIGNAL reset : STD_LOGIC;
-SIGNAL tx_available : STD_LOGIC;
+SIGNAL tx_done : STD_LOGIC;
 SIGNAL tx_in : STD_LOGIC_VECTOR(0 TO 15);
 SIGNAL tx_out : STD_LOGIC;
 SIGNAL tx_start : STD_LOGIC;
@@ -44,7 +44,7 @@ COMPONENT uart_tx
 	PORT (
 	clk : IN STD_LOGIC;
 	reset : IN STD_LOGIC;
-	tx_available : OUT STD_LOGIC;
+	tx_done : OUT STD_LOGIC;
 	tx_in : IN STD_LOGIC_VECTOR(0 TO 15);
 	tx_out : OUT STD_LOGIC;
 	tx_start : IN STD_LOGIC
@@ -56,7 +56,7 @@ BEGIN
 -- list connections between master ports and signals
 	clk => clk,
 	reset => reset,
-	tx_available => tx_available,
+	tx_done => tx_done,
 	tx_in => tx_in,
 	tx_out => tx_out,
 	tx_start => tx_start
@@ -76,7 +76,7 @@ always : PROCESS
 BEGIN                                                         
         tx_start <= '0';
 	tx_in <= "1001111001010011";
-	WAIT FOR clk_period;
+	WAIT FOR clk_period + clk_period/10;
 	tx_start <= '1';
 	WAIT FOR clk_period;
 	tx_start <= '0';
