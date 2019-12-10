@@ -28,7 +28,11 @@ entity uart_tx is
         --! Reset
         reset       : in std_logic;
         --! Data that needs to be transmitted
+<<<<<<< Updated upstream
         tx_in       : in std_logic_vector (0 to n - 1);
+=======
+        tx_in       : in std_logic_vector (n - 1 downto 0);
+>>>>>>> Stashed changes
         --! Command to start transmittion
         tx_start    : in std_logic;                        
 
@@ -67,9 +71,15 @@ architecture behavioral of uart_tx is
     --! Previous value of command for start of transmission
     signal tx_start_prev                    : std_logic := '0';
     --! Stores lower half of #tx_in
+<<<<<<< Updated upstream
     signal tx_in_lower                      : std_logic_vector(0 to n/2 - 1);
     --! Stores higher half of #tx_in
     signal tx_in_higher                     : std_logic_vector(0 to n/2 - 1);
+=======
+    signal tx_in_lower                      : std_logic_vector(n/2 - 1 downto 0);
+    --! Stores higher half of #tx_in
+    signal tx_in_higher                     : std_logic_vector(n/2 - 1 downto 0);
+>>>>>>> Stashed changes
     --! Flags for determining if the coresponding parts of tx_in are sent
     signal tx_l_sent, tx_h_sent             : std_logic := '0';
     signal tx_l_sent_prev, tx_h_sent_prev   : std_logic := '0';
@@ -79,6 +89,7 @@ architecture behavioral of uart_tx is
     signal baud_clk, baud_clk_prev          : std_logic := '0';
     --! Flag when #bits_cnt finishes:
     signal bits_cnt_finished                : std_logic;
+<<<<<<< Updated upstream
     --! Flag for when #next_state is SEND
     signal next_state_send                  : std_logic := '0';
     
@@ -92,16 +103,46 @@ begin
     
     -- Set flag #next_state_send if #next_state is SEND
     next_state_flag_logic: process(next_state, state_reg) is
+=======
+    --! Flags for when #state_reg and #next_state are SEND
+    signal state_reg_send, next_state_send  : std_logic := '0';
+    
+begin
+    -- Partition #tx_in in two separate bytes:
+    tx_in_lower     <= tx_in(n/2 - 1 downto 0);
+    tx_in_higher    <= tx_in(n - 1 downto n/2);
+    
+    -- Set flag #tx_done if both lower and higher parts are sent:
+    tx_done         <= tx_l_sent and tx_h_sent;
+    
+    --! Sets flag for #next_state_send if #next_state is SEND
+    next_state_send_flag_logic: process(next_state, state_reg) is
+>>>>>>> Stashed changes
     begin
         if next_state = SEND and state_reg = START then
             next_state_send <= '1';
         else
             next_state_send <= '0';
         end if;           
+<<<<<<< Updated upstream
     end process next_state_flag_logic;
     
     -- Set flag for raising edge of tx_start:
     tx_start_edge   <= tx_start and (not tx_start_prev);
+=======
+    end process next_state_send_flag_logic;
+    
+    --! Sets flag for raising edge of tx_start if #state_reg is START
+    tx_start_edge_logic: process(state_reg, tx_start, tx_start_prev) is
+    begin
+        case state_reg is
+        when IDLE =>
+            tx_start_edge   <= tx_start and (not tx_start_prev);
+        when others =>
+            rx_start_edge   <= '0';
+        end case;
+    end process tx_start_edge_logic;
+>>>>>>> Stashed changes
     
     --! Counts baud_cnt_max clock rising edges
     clk_counter: counter
@@ -110,13 +151,18 @@ begin
         )
         port map (
             clk         => clk,
+<<<<<<< Updated upstream
             reset       => reset,
+=======
+            reset       => tx_start_edge,
+>>>>>>> Stashed changes
             step        => clk,
             value       => baud_cnt,
             finished    => baud_clk
         );
         
         
+<<<<<<< Updated upstream
      --! Counter of bits that are transmitted
     bits_counter: counter
         generic map ( 
@@ -125,6 +171,16 @@ begin
         port map (
             clk         => clk,
             reset       => next_state_send,
+=======
+    --! Counter of bits that are transmitted
+    bits_counter: counter
+        generic map ( 
+            n => n/2
+        )
+        port map (
+            clk         => clk,
+            reset       => state_reg_send,
+>>>>>>> Stashed changes
             step        => baud_clk,
             value       => bits_cnt,
             finished    => bits_cnt_finished
@@ -146,6 +202,10 @@ begin
             tx_start_prev   <= tx_start;
             tx_l_sent_prev  <= tx_l_sent;
             tx_h_sent_prev  <= tx_h_sent;
+<<<<<<< Updated upstream
+=======
+            state_reg_send  <= next_state_send;
+>>>>>>> Stashed changes
         end if;
     end process state_transition;
     

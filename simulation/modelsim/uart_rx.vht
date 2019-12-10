@@ -18,7 +18,7 @@
 -- suit user's needs .Comments are provided in each section to help the user  
 -- fill out necessary details.                                                
 -- ***************************************************************************
--- Generated on "12/08/2019 17:04:05"
+-- Generated on "12/10/2019 12:42:52"
                                                             
 -- Vhdl Test Bench template for design  :  uart_rx
 -- 
@@ -31,19 +31,19 @@ USE ieee.std_logic_1164.all;
 ENTITY uart_rx_vhd_tst IS
 END uart_rx_vhd_tst;
 ARCHITECTURE uart_rx_arch OF uart_rx_vhd_tst IS
--- constants  
-CONSTANT clk_period : time := 0.02 ns;                                                
+-- constants   
+CONSTANT clk_period : time :=  0.02 ns;                                              
 -- signals                                                   
 SIGNAL clk : STD_LOGIC;
 SIGNAL reset : STD_LOGIC;
-SIGNAL rx_available : STD_LOGIC;
+SIGNAL rx_done : STD_LOGIC;
 SIGNAL rx_in : STD_LOGIC;
 SIGNAL rx_out : STD_LOGIC_VECTOR(0 TO 15);
 COMPONENT uart_rx
 	PORT (
 	clk : IN STD_LOGIC;
 	reset : IN STD_LOGIC;
-	rx_available : OUT STD_LOGIC;
+	rx_done : OUT STD_LOGIC;
 	rx_in : IN STD_LOGIC;
 	rx_out : OUT STD_LOGIC_VECTOR(0 TO 15)
 	);
@@ -54,68 +54,73 @@ BEGIN
 -- list connections between master ports and signals
 	clk => clk,
 	reset => reset,
-	rx_available => rx_available,
+	rx_done => rx_done,
 	rx_in => rx_in,
 	rx_out => rx_out
 	);
-init : PROCESS                                               
+clk_gen : PROCESS                                               
 -- variable declarations                                     
 BEGIN                                                        
-      	clk <= '1';
-	WAIT FOR clk_period/2;
+	clk <= '1';
+	wait for clk_period/2;
 	clk <= '0';
-	WAIT FOR clk_period/2;
-                                                      
-END PROCESS init;                                           
+	wait for clk_period/2;
+END PROCESS clk_gen;                                           
 always : PROCESS                                              
 -- optional sensitivity list                                  
 -- (        )                                                 
 -- variable declarations                                      
-BEGIN              
-                                           
-	rx_in <= '1';
-	wait for 10*clk_period + clk_period/10;
+BEGIN   
+	-- drive input high                                                      
+       	rx_in <= '1';
+	wait for clk_period*5 + clk_period/2;
+	-- send start bit
 	rx_in <= '0';
-	wait for 2064*clk_period; 
+	wait for 2604*clk_period;
 
 	rx_in <= '1';
-	wait for 2064*clk_period + clk_period/10; 
-	rx_in <= '1';
-	wait for 2064*clk_period + clk_period/10;  
-	rx_in <= '1';
-	wait for 2064*clk_period + clk_period/10;  
+	wait for 2604*clk_period;
 	rx_in <= '0';
-	wait for 2064*clk_period + clk_period/10; 
-
-	rx_in <= '1';
-	wait for 2064*clk_period + clk_period/10; 
-	rx_in <= '1';
-	wait for 2064*clk_period + clk_period/10; 
-	rx_in <= '1';
-	wait for 2064*clk_period + clk_period/10; 
+	wait for 2604*clk_period;
 	rx_in <= '0';
-	wait for 2064*clk_period + clk_period/10; 
-
-	rx_in <= '0';
-	wait for 2064*clk_period + clk_period/10; 
-	rx_in <= '0';
-	wait for 2064*clk_period + clk_period/10; 
+	wait for 2604*clk_period;
 	rx_in <= '1';
-	wait for 2064*clk_period + clk_period/10; 
-	rx_in <= '0';
-	wait for 2064*clk_period + clk_period/10; 
-
+	wait for 2604*clk_period;
 	rx_in <= '1';
-	wait for 2064*clk_period + clk_period/10; 
+	wait for 2604*clk_period;
 	rx_in <= '0';
-	wait for 2064*clk_period + clk_period/10; 
+	wait for 2604*clk_period;
+	rx_in <= '0';
+	wait for 2604*clk_period;
 	rx_in <= '1';
-	wait for 2064*clk_period + clk_period/10; 
+	wait for 2604*clk_period;
+	
+	-- send stop bit
+	rx_in <= '1';
+	wait for 2604*clk_period;
+	-- send start bit
 	rx_in <= '0';
-	wait for 2064*clk_period + clk_period/10; 
+	wait for 2604*clk_period;
 	
 	rx_in <= '1';
-	  
+	wait for 2604*clk_period; 
+	rx_in <= '0';
+	wait for 2604*clk_period;
+	rx_in <= '1';
+	wait for 2604*clk_period;
+	rx_in <= '0';
+	wait for 2604*clk_period;
+	rx_in <= '1';
+	wait for 2604*clk_period;
+	rx_in <= '0';
+	wait for 2604*clk_period;
+	rx_in <= '1';
+	wait for 2604*clk_period;
+	rx_in <= '0';
+	wait for 2604*clk_period;
+	
+	-- drive input high
+	rx_in <= '1';
 WAIT;                                                        
 END PROCESS always;                                          
 END uart_rx_arch;
