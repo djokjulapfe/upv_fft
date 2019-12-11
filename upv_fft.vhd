@@ -100,13 +100,20 @@ architecture struct of upv_fft is
         );
     end component fftn_output_serializer;
 
-    constant n                 : integer := 16;
-    signal rerouter_output     : complex_vector(0 to n - 1);
-    signal input_buffer_output : complex_vector(0 to n - 1);
-    signal fft_out             : complex_vector(0 to n - 1);
-    signal input_buffer_ready  : std_logic;
-    signal calculating_fftn    : std_logic;
-    signal fft_finished        : std_logic;
+    constant n             : integer := 16;
+    constant bits_per_data : integer := 8;
+
+    signal rerouter_output           : complex_vector(0 to n - 1);
+    signal input_buffer_output       : complex_vector(0 to n - 1);
+    signal fft_out                   : complex_vector(0 to n - 1);
+    signal input_buffer_ready        : std_logic;
+    signal calculating_fftn          : std_logic;
+    signal fft_finished              : std_logic;
+    signal fftn_counter_should_count : std_logic;
+
+    signal serializer_data_ready : std_logic;
+    signal serializer_data       : std_logic_vector(bits_per_data - 1 downto 0);
+    signal uart_tx_step          : std_logic;
 
 begin
 
@@ -156,22 +163,26 @@ begin
             ready         => input_buffer_ready
         );
 
+    fftn_counter_should_count <= calculating_fftn and not fft_finished;
+
     fftn_counter : entity work.counter
         generic map (
-            n => integer(log2(real(n)))
+            n => 2 * integer(log2(real(n)))
         )
         port map (
             clk      => clk,
             reset    => reset,
-            step     => calculating_fftn,
+            step     => fftn_counter_should_count,
             value    => open,
             finished => fft_finished
         );
 
+    uart_tx_step <= serializer_data_ready or fft_finished;
+
     main_fftn_output_serializer : entity work.fftn_output_serializer
         generic map (
             n             => n,
-            bits_per_data => 8
+            bits_per_data => bits_per_data
         )
         port map (
             clk        => clk,
@@ -179,8 +190,8 @@ begin
             fftn_out   => fft_out,
             start      => fft_finished,
             step       => fake_uart_step,
-            data       => open,
-            data_ready => open
+            data       => serializer_data,
+            data_ready => serializer_data_ready
         );
 
 end architecture struct;

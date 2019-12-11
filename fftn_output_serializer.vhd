@@ -44,8 +44,7 @@ architecture behav of fftn_output_serializer is
     signal item_finished : std_logic;
     signal all_finished  : std_logic;
 
-    signal selected_value : complex;
-    signal selected_item  : signed(word_size - 1 downto 0);
+    signal data_ready_delay : std_logic;
 
     signal item_step_mask  : std_logic;
     signal chunk_step_mask : std_logic;
@@ -65,26 +64,40 @@ begin
         end if;
     end process update_state;
 
-    selection : process (fftn_out, value_index, chunk_index) is
-        variable selection : signed(bits_per_data - 1 downto 0);
+    selection : process (clk) is
+        variable selection      : signed(bits_per_data - 1 downto 0);
+        variable selected_value : complex;
+        variable selected_item  : signed(word_size - 1 downto 0);
     begin
-        selected_value <= fftn_out(value_index);
-        if chunk_index < num_chunks then
-            selected_item <= selected_value.re;
+        if rising_edge(clk) then
+            selected_value := fftn_out(value_index);
+            if chunk_index < num_chunks then
+                selected_item := selected_value.re;
 
-            selection := selected_item((chunk_index + 1) * bits_per_data - 1
-                    downto chunk_index * bits_per_data);
-        else
-            selected_item <= selected_value.im;
+                selection := selected_item((chunk_index + 1) * bits_per_data - 1
+                        downto chunk_index * bits_per_data);
+            else
+                selected_item := selected_value.im;
 
-            selection := selected_item((chunk_index - num_chunks + 1) * bits_per_data - 1
-                    downto (chunk_index - num_chunks) * bits_per_data);
+                selection := selected_item((chunk_index - num_chunks + 1) * bits_per_data - 1
+                        downto (chunk_index - num_chunks) * bits_per_data);
+            end if;
+            data <= std_logic_vector(selection);
+            if ((chunk_index /= 2 * num_chunks - 1 and chunk_step_mask = '1') or item_step_mask = '1')
+                and started = '1' then
+
+                data_ready_delay <= '1';
+            else
+                data_ready_delay <= '0';
+            end if;
+            data_ready <= data_ready_delay;
         end if;
-        data <= std_logic_vector(selection);
     end process selection;
 
     item_step_mask  <= item_finished and started;
     chunk_step_mask <= step and started;
+
+    --data_ready <= started and all_finished;
 
     item_counter : entity work.counter
         generic map (

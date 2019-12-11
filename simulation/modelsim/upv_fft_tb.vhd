@@ -46,6 +46,23 @@ begin
         fake_uart_step  <= '0';
         wait for clk_period;
         reset <= '0';
+        wait for clk_period * 5;
+
+        for i in 0 to 15 loop
+            tmp <= pair2complex(i, 2 * i);
+            fake_uart_ready <= '1';
+            wait for clk_period;
+            fake_uart_ready <= '0';
+            wait for clk_period * 100;
+        end loop;
+
+        for i in 0 to 4 * 16 - 1 loop
+            fake_uart_step <= '1';
+            wait for clk_period;
+            fake_uart_step <= '0';
+            wait for clk_period * 50;
+        end loop;
+
         wait;
     end process main;
 

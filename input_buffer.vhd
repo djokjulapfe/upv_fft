@@ -32,20 +32,21 @@ entity input_buffer is
         --! Current state of the buffer
         buffered_data : buffer complex_vector(0 to word_size - 1);
         --! Flag indicating n values have been stored.
-        ready : out std_logic
+        ready : buffer std_logic
     );
 end entity input_buffer;
 
 architecture behav of input_buffer is
 
     --! Points to the location where to store the next value
-    signal counter : integer;
+    signal counter : integer range 0 to n - 1;
 
 begin
 
     --buffered_data <= internal_buffer;
 
     main : process (clk) is
+        variable new_counter_value : integer range 0 to n - 1;
     begin
         if rising_edge(clk) then
             if reset = '1' then
@@ -53,16 +54,27 @@ begin
                 ready         <= '0';
                 buffered_data <= (others => pair2complex(0, 0));
             else
-                if input_ready = '1' then
-                    buffered_data(counter) <= word_in;
-                    counter                <= counter + 1;
-                end if;
-                if counter = n - 1 then
-                    counter <= 0;
-                    ready   <= '1';
-                else
+                if ready = '1' then
                     ready <= '0';
                 end if;
+                if input_ready = '1' then
+                    buffered_data(counter) <= word_in;
+                    if counter = n - 1 then
+                        new_counter_value := 0;
+                    else
+                        new_counter_value := counter + 1;
+                    end if;
+                    if new_counter_value = 0 then
+                        ready <= '1';
+                    end if;
+                    counter <= new_counter_value;
+                end if;
+            --if counter = n - 1 then
+            --    counter <= 0;
+            --    ready   <= '1';
+            --else
+            --    ready <= '0';
+            --end if;
             end if;
         end if;
     end process main;
