@@ -24,6 +24,7 @@ begin
 		if rising_edge(clk) then
 			if reset = '1' then
 				value <= 0;
+				finished <= '0';
 			elsif step = '1' then 
 				if value = n - 1 then
 					value <= 0;
