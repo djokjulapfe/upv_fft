@@ -47,25 +47,19 @@ architecture comb of fftn is
 
 begin
 
-    reset_logic : process (clk) is
-    begin
-        if rising_edge(clk) and reset = '1' then
-            fft_upper_half <= (others => pair2complex(0, 0));
-            fft_lower_half <= (others => pair2complex(0, 0));
-            mult_out <= (others => pair2complex(0, 0));
-            mid_buffer <= (others => pair2complex(0, 0));
-        end if;
-    end process reset_logic;
-
     -- Updates the #mid_buffer with new data
     update_buffer : process (clk) is
     begin
-        if rising_edge(clk) and reset = '0' then
-            if n = 2 then
-                mid_buffer <= fft_in;
+        if rising_edge(clk) then
+            if reset = '1' then
+                mid_buffer <= (others => pair2complex(0, 0));
             else
-                mid_buffer(0 to n / 2 - 1) <= fft_upper_half_out;
-                mid_buffer(n / 2 to n - 1) <= mult_out;
+                if n = 2 then
+                    mid_buffer <= fft_in;
+                else
+                    mid_buffer(0 to n / 2 - 1) <= fft_upper_half_out;
+                    mid_buffer(n / 2 to n - 1) <= mult_out;
+                end if;
             end if;
         end if;
     end process update_buffer;
@@ -73,11 +67,15 @@ begin
     -- Combines the #mid_buffer data to the final output of the fftn block
     cross_combine : process (clk) is
     begin
-        if rising_edge(clk) and reset = '0' then
-            for i in 0 to n / 2 - 1 loop
-                fft_out(i)       <= mid_buffer(i) + mid_buffer(n / 2 + i);
-                fft_out(n/2 + i) <= mid_buffer(i) - mid_buffer(n / 2 + i);
-            end loop;
+        if rising_edge(clk) then
+            if reset = '1' then
+                fft_out <= (others => pair2complex(0, 0));
+            else
+                for i in 0 to n / 2 - 1 loop
+                    fft_out(i)       <= mid_buffer(i) + mid_buffer(n / 2 + i);
+                    fft_out(n/2 + i) <= mid_buffer(i) - mid_buffer(n / 2 + i);
+                end loop;
+            end if;
         end if;
     end process cross_combine;
 
@@ -85,19 +83,21 @@ begin
     fft_half : if n > 2 generate
         fft_upper_half : entity work.fftn
             generic map (
-                n     => n / 2
+                n => n / 2
             )
             port map (
                 clk     => clk,
+                reset   => reset,
                 fft_in  => fft_in(0 to n / 2 - 1),
                 fft_out => fft_upper_half_out
             );
         fft_lower_half : entity work.fftn
             generic map (
-                n     => n / 2
+                n => n / 2
             )
             port map (
                 clk     => clk,
+                reset   => reset,
                 fft_in  => fft_in(n / 2 to n - 1),
                 fft_out => fft_lower_half_out
             );

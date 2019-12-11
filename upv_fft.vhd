@@ -11,6 +11,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+use ieee.math_real."log2";
 
 use work.types.all;
 
@@ -18,12 +19,16 @@ use work.types.all;
 entity upv_fft is
     port (
         --! clock
-        clk : in std_logic;
+        clk   : in std_logic;
+        reset : in std_logic;
         --! UART rx
         uart_in : in std_logic;
         --! UART tx
         uart_out : out std_logic;
-        tmp : in complex_vector(0 to 15)
+
+        tmp             : in complex;
+        fake_uart_ready : in std_logic;
+        fake_uart_step  : in std_logic
     );
 end entity upv_fft;
 
@@ -52,14 +57,71 @@ architecture struct of upv_fft is
         );
     end component rerouter;
 
+    component input_buffer is
+        generic (
+            n : integer := 16
+        );
+        port (
+            clk           : in     std_logic;
+            reset         : in     std_logic;
+            input_ready   : in     std_logic;
+            word_in       : in     complex;
+            buffered_data : buffer complex_vector(0 to word_size - 1);
+            ready         : out    std_logic
+        );
+    end component input_buffer;
+
+    component counter is
+        generic (
+            n : integer := 100
+        );
+        port (
+            clk      : in     std_logic;
+            reset    : in     std_logic;
+            step     : in     std_logic;
+            value    : buffer integer range 0 to n;
+            finished : out    std_logic
+        );
+    end component counter;
+
+    component fftn_output_serializer is
+        generic (
+            n             : integer := 16;
+            bits_per_data : integer := 8
+        );
+        port (
+            clk        : in  std_logic;
+            reset      : in  std_logic;
+            fftn_out   : in  complex_vector(0 to n - 1);
+            start      : in  std_logic;
+            step       : in  std_logic;
+            data       : out std_logic_vector(bits_per_data - 1 downto 0);
+            data_ready : out std_logic
+        );
+    end component fftn_output_serializer;
+
     constant n                 : integer := 16;
     signal rerouter_output     : complex_vector(0 to n - 1);
     signal input_buffer_output : complex_vector(0 to n - 1);
-    signal fft_out : complex_vector(0 to n - 1);
+    signal fft_out             : complex_vector(0 to n - 1);
+    signal input_buffer_ready  : std_logic;
+    signal calculating_fftn    : std_logic;
+    signal fft_finished        : std_logic;
 
 begin
 
-    input_buffer_output <= tmp;
+    calculating_fftn_logic : process (clk) is
+    begin
+        if rising_edge(clk) then
+            if reset = '1' then
+                calculating_fftn <= '0';
+            elsif input_buffer_ready = '1' then
+                calculating_fftn <= '1';
+            elsif fft_finished = '1' then
+                calculating_fftn <= '0';
+            end if;
+        end if;
+    end process calculating_fftn_logic;
 
     main_rerouter : entity work.rerouter
         generic map (
@@ -72,12 +134,53 @@ begin
 
     main_fftn : entity work.fftn
         generic map (
-            n     => n
+            n => n
         )
         port map (
             clk     => clk,
+            reset   => reset,
             fft_in  => rerouter_output,
             fft_out => fft_out
+        );
+
+    main_input_buffer : entity work.input_buffer
+        generic map (
+            n => n
+        )
+        port map (
+            clk           => clk,
+            reset         => reset,
+            input_ready   => fake_uart_ready,
+            word_in       => tmp,
+            buffered_data => input_buffer_output,
+            ready         => input_buffer_ready
+        );
+
+    fftn_counter : entity work.counter
+        generic map (
+            n => integer(log2(real(n)))
+        )
+        port map (
+            clk      => clk,
+            reset    => reset,
+            step     => calculating_fftn,
+            value    => open,
+            finished => fft_finished
+        );
+
+    main_fftn_output_serializer : entity work.fftn_output_serializer
+        generic map (
+            n             => n,
+            bits_per_data => 8
+        )
+        port map (
+            clk        => clk,
+            reset      => reset,
+            fftn_out   => fft_out,
+            start      => fft_finished,
+            step       => fake_uart_step,
+            data       => open,
+            data_ready => open
         );
 
 end architecture struct;
