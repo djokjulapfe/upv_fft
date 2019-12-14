@@ -34,11 +34,10 @@ entity uart_rx is
         reset       : in std_logic;
         --! Serial input
         rx_in       : in std_logic;
-		  rx_int 	  : out std_logic;
         
         -- Outputs:
         --! Data of 2 bytes put into std_logic_vector
-        rx_out      : out std_logic_vector(n - 1 downto 0);
+        rx_out      : out std_logic_vector(0 to n - 1);
         --! Flag indicating that output data is ready to be processed
         rx_done     : out std_logic
     
@@ -72,8 +71,8 @@ architecture behavioral of uart_rx is
     --! Counter for bits that were received
     signal bits_cnt                                 : integer range 0 to n/2 - 1 := 0;
     --! Registers for lower and higher byte 
-    signal rx_out_lower, rx_out_higher              : std_logic_vector(n/2 - 1 downto 0) := (others => '0');
-    signal rx_out_lower_prev, rx_out_higher_prev    : std_logic_vector(n/2 - 1 downto 0) := (others => '0');
+    signal rx_out_lower, rx_out_higher              : std_logic_vector(n/2 - 1 downto 0);
+    signal rx_out_lower_prev, rx_out_higher_prev    : std_logic_vector(n/2 - 1 downto 0);
     --! Register for number of two bytes that is received and needs to be converted
     signal rx_out_reg                               : std_logic_vector(n - 1 downto 0);
     --! Stores previous value of rx_in
@@ -95,20 +94,13 @@ architecture behavioral of uart_rx is
     signal state_reg_rcv, next_state_rcv            : std_logic := '0';
     
 begin
-
-	 rx_int <= not rx_in;
-
     --! Sets flag #rx_done if both bytes were received
     rx_done <= rx_l_rcv and rx_h_rcv;
     
     --! #rx_out is made of #rx_out_lower and #rx_out_higher
-    rx_out(n/2 - 1 downto 0) <= rx_out_lower;
-    rx_out(n - 1 downto n/2) <= rx_out_higher;
-	 
-	 
-    --! Control of output 
-    --rx_out <= rx_out_reg;
-	 
+    rx_out_reg(n/2 - 1 downto 0) <= rx_out_lower;
+    rx_out_reg(n - 1 downto n/2) <= rx_out_higher;
+    
     --! Sets #rx_in_edge if falling edge is detected in IDLE state
     rx_in_edge_logic: process(state_reg, rx_in, rx_in_prev) is
     begin
@@ -240,6 +232,8 @@ begin
         
     end process next_state_logic;
 
+    --! Control of output 
+    rx_out <= rx_out_reg;
 
     --! Control of received data
     rx_data_logic: process(state_reg, rx_l_rcv, sample_cnt, rx_out_lower_prev, rx_out_higher_prev, rx_in, bits_cnt) is

@@ -1,3 +1,13 @@
+--------------------------------------------------------------------------------
+-- Title       : Rerouter testbench
+-- Project     : FFT
+-- File        : rerouter_tb.vhd
+-- Authors     : Djordje & Dusan
+-- Created     : Sun Dec  6
+-- Version     : 1.0
+-- Description : Testbench for Rerouter 
+-------------------------------------------------------------------------------
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;

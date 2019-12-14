@@ -37,8 +37,8 @@
 
 
 set_global_assignment -name FAMILY "Cyclone V"
-set_global_assignment -name DEVICE 5CSEMA6F31C6
-set_global_assignment -name TOP_LEVEL_ENTITY uart_tx
+set_global_assignment -name DEVICE 5CSEMA5F31C6
+set_global_assignment -name TOP_LEVEL_ENTITY uart_rx
 set_global_assignment -name ORIGINAL_QUARTUS_VERSION 18.1.0
 set_global_assignment -name PROJECT_CREATION_TIME_DATE "16:48:27  NOVEMBER 28, 2019"
 set_global_assignment -name LAST_QUARTUS_VERSION "18.1.1 Lite Edition"
@@ -49,25 +49,48 @@ set_global_assignment -name ERROR_CHECK_FREQUENCY_DIVISOR 256
 set_global_assignment -name EDA_SIMULATION_TOOL "ModelSim-Altera (VHDL)"
 set_global_assignment -name EDA_TIME_SCALE "1 ps" -section_id eda_simulation
 set_global_assignment -name EDA_OUTPUT_DATA_FORMAT VHDL -section_id eda_simulation
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-set_global_assignment -name VHDL_FILE upv_fft.vhd
-set_global_assignment -name NUM_PARALLEL_PROCESSORS 8
-
+set_global_assignment -name VHDL_FILE weights.vhd
 set_global_assignment -name VHDL_FILE uart_tx.vhd
 set_global_assignment -name VHDL_FILE uart_rx.vhd
-=======
-set_global_assignment -name VHDL_FILE uart_tx.vhd
->>>>>>> Stashed changes
-set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
-set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
-set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
-=======
-set_global_assignment -name VHDL_FILE types.vhd
-set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
-set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
-set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
-set_global_assignment -name VHDL_FILE uart_rx.vhd
->>>>>>> Stashed changes
+set_global_assignment -name VHDL_FILE fftn_output_serializer.vhd
 set_global_assignment -name VHDL_FILE counter.vhd
+set_global_assignment -name VHDL_FILE upv_fft.vhd
+set_global_assignment -name VHDL_FILE complex_weight.vhd
+set_global_assignment -name VHDL_FILE fftn.vhd
+set_global_assignment -name VHDL_FILE input_buffer.vhd
+set_global_assignment -name VHDL_FILE rerouter.vhd
+set_global_assignment -name VHDL_FILE types.vhd
+set_global_assignment -name POWER_PRESET_COOLING_SOLUTION "23 MM HEAT SINK WITH 200 LFPM AIRFLOW"
+set_global_assignment -name POWER_BOARD_THERMAL_MODEL "NONE (CONSERVATIVE)"
+set_global_assignment -name TCL_SCRIPT_FILE lab_setup.tcl
+set_global_assignment -name DEVICE_FILTER_PACKAGE FBGA
+set_global_assignment -name DEVICE_FILTER_PIN_COUNT 896
+set_global_assignment -name DEVICE_FILTER_SPEED_GRADE 6
+set_location_assignment PIN_AF14 -to clk
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to clk
+set_location_assignment PIN_AB12 -to reset
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to reset
+set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
+set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
+set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
+set_location_assignment PIN_V16 -to rx_out[0]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to rx_out[0]
+set_location_assignment PIN_W16 -to rx_out[1]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to rx_out[1]
+set_location_assignment PIN_V17 -to rx_out[2]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to rx_out[2]
+set_location_assignment PIN_V18 -to rx_out[3]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to rx_out[3]
+set_location_assignment PIN_W17 -to rx_out[4]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to rx_out[4]
+set_location_assignment PIN_W19 -to rx_out[5]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to rx_out[5]
+set_location_assignment PIN_Y19 -to rx_out[6]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to rx_out[6]
+set_location_assignment PIN_W20 -to rx_out[7]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to rx_out[7]
+set_location_assignment PIN_AC18 -to rx_in
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to rx_in
+set_location_assignment PIN_W21 -to rx_int
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to rx_int
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
