@@ -71,8 +71,8 @@ begin
     begin
         if rising_edge(clk) then
             if reset = '1' then
-                data <= (others => '0');
-                data_ready <= '0';
+                data             <= (others => '0');
+                data_ready       <= '0';
                 data_ready_delay <= '0';
             else
                 selected_value := fftn_out(value_index);

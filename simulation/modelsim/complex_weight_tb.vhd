@@ -49,7 +49,7 @@ begin
         weight_choice <= 7;
         wait;
     end process main;
-    
+
     DUT1 : entity work.complex_weight
         port map (
             x_in          => x1_in,

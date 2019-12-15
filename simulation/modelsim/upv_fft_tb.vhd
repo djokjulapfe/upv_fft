@@ -49,7 +49,7 @@ begin
         wait for clk_period * 5;
 
         for i in 0 to 15 loop
-            tmp <= pair2complex(i, 2 * i);
+            tmp             <= pair2complex(i, 2 * i);
             fake_uart_ready <= '1';
             wait for clk_period;
             fake_uart_ready <= '0';

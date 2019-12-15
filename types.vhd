@@ -83,7 +83,7 @@ package types is
     function "*"(
             a, b : complex
         ) return complex_double;
-    
+
 end package types;
 
 package body types is

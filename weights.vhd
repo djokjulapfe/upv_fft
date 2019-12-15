@@ -10,7 +10,7 @@ use work.types.all;
 
 package weights is
 
-    constant num_weights : integer := 8;
+    constant num_weights      : integer := 8;
     constant weight_precision : integer := 10;
 
     constant W : complex_vector(0 to 7) := (

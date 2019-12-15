@@ -22,7 +22,7 @@ entity rerouter is
 	);
 	port (
 		--! Unordered input
-		x : in  complex_vector(0 to n - 1);
+		x : in complex_vector(0 to n - 1);
 		--! Orderede output
 		y : out complex_vector(0 to n - 1)
 	);

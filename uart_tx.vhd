@@ -17,7 +17,7 @@ entity uart_tx is
         tx_in    : in std_logic_vector(bits_per_data - 1 downto 0);
         tx_start : in std_logic;
 
-        tx_out  : out std_logic;
+        tx_out  : out    std_logic;
         tx_done : buffer std_logic
     );
 end entity uart_tx;
@@ -44,17 +44,17 @@ architecture behav of uart_tx is
     signal sample_clk          : std_logic;
     signal sample_reset        : std_logic;
     signal bits_counter_reset  : std_logic;
-    signal bits_counter_step : std_logic;
-    signal current_bit : integer;
-    signal started : std_logic;
-	 signal ptx_start : std_logic;
+    signal bits_counter_step   : std_logic;
+    signal current_bit         : integer;
+    signal started             : std_logic;
+    signal ptx_start           : std_logic;
 
 begin
 
     start : process (clk) is
     begin
         if rising_edge(clk) then
-		      ptx_start <= tx_start;
+            ptx_start <= tx_start;
             if reset = '1' then
                 started <= '0';
             elsif tx_start = '0' and ptx_start = '1' then
@@ -69,7 +69,7 @@ begin
     begin
         if rising_edge(clk) then
             if reset = '1' then
-                sample_clk <= '1';
+                sample_clk        <= '1';
                 bits_counter_step <= '0';
             else
                 bits_counter_step <= '0';
@@ -86,13 +86,13 @@ begin
     transmission : process (clk, sample_clk) is
     begin
         if rising_edge(clk) then
-				if reset = '1' or tx_done = '1' then
-				    tx_out <= '1';
+            if reset = '1' or tx_done = '1' then
+                tx_out <= '1';
             elsif current_bit = 0 and started = '1' then
                 tx_out <= '0';
             elsif current_bit /= 0 and started = '1' then
                 tx_out <= tx_in(current_bit - 1);
-			   end if;
+            end if;
         end if;
     end process transmission;
 

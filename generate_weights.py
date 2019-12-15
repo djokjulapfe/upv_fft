@@ -35,10 +35,10 @@ output_pre: list = [
     "\n",
     "package weights is\n",
     "\n",
-    "    constant num_weights : integer := " + str(n) + ";\n",
+    "    constant num_weights      : integer := " + str(n) + ";\n",
     "    constant weight_precision : integer := " + str(precision) + ";\n",
     "\n",
-    "    constant W : complex_vector(0 to 7) := (\n"
+    "    constant W : complex_vector(0 to " + str(n - 1) + ") := (\n"
 ]
 
 output_post: list = [
