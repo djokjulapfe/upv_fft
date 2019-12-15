@@ -11,7 +11,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
---use ieee.math_real."log2";
+use ieee.math_real."log2";
 
 use work.types.all;
 
@@ -167,7 +167,7 @@ begin
 
     fftn_counter : entity work.counter
         generic map (
-            n => 2 * 4--integer(log2(real(n)))
+            n => 2 * integer(log2(real(n)))
         )
         port map (
             clk      => clk,

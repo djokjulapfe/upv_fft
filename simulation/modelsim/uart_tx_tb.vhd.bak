@@ -32,15 +32,11 @@ begin
     main : process
     begin
     	reset <= '1';
-    	tx_in <= "01000100";
+    	tx_in <= "10110010";
     	tx_start <= '0';
-    	wait for clk_period * 100;
+    	wait for clk_period;
     	reset <= '0';
-		wait for clk_period * 500;
-		tx_start <= '1';
-		wait for clk_period * 100;
-		tx_start <= '0';
-      wait;
+        wait;
     end process main;
 
 	DUT : entity work.uart_tx
