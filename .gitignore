@@ -10,4 +10,5 @@ c5_pin_model_dump.txt
 doxygen/
 .idea
 *.bak
+*.qws
 
