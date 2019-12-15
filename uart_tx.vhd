@@ -101,7 +101,7 @@ begin
 
     sample_counter : entity work.counter
         generic map (
-            n => 16 * sample_cnt_max / 2
+            n => samples_per_bit * sample_cnt_max / 2
         )
         port map (
             clk      => clk,
