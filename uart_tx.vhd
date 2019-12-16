@@ -17,8 +17,8 @@ entity uart_tx is
         tx_in    : in std_logic_vector(bits_per_data - 1 downto 0);
         tx_start : in std_logic;
 
-        tx_out  : out    std_logic;
-        tx_done : buffer std_logic
+        tx_out : out    std_logic;
+        done   : buffer std_logic
     );
 end entity uart_tx;
 
@@ -39,6 +39,7 @@ architecture behav of uart_tx is
     end component counter;
 
     constant sample_cnt_max : integer := freq / baud_rate / samples_per_bit;
+    constant uart_tx_delay  : integer := 16 * sample_cnt_max;
 
     signal sample_cnt_finished : std_logic;
     signal sample_clk          : std_logic;
@@ -48,6 +49,7 @@ architecture behav of uart_tx is
     signal current_bit         : integer;
     signal started             : std_logic;
     signal ptx_start           : std_logic;
+    signal tx_done             : std_logic;
 
 begin
 
@@ -73,10 +75,14 @@ begin
                 bits_counter_step <= '0';
             else
                 bits_counter_step <= '0';
+                tx_done           <= '0';
                 if sample_cnt_finished = '1' then
                     sample_clk <= not sample_clk;
                     if sample_clk = '0' then
                         bits_counter_step <= '1';
+                        if current_bit = bits_per_data + 1 then
+                            tx_done <= '1';
+                        end if;
                     end if;
                 end if;
             end if;
@@ -90,6 +96,8 @@ begin
                 tx_out <= '1';
             elsif current_bit = 0 and started = '1' then
                 tx_out <= '0';
+            elsif current_bit > bits_per_data and started = '1' then
+                tx_out <= '1';
             elsif current_bit /= 0 and started = '1' then
                 tx_out <= tx_in(current_bit - 1);
             end if;
@@ -113,14 +121,14 @@ begin
 
     bits_counter : entity work.counter
         generic map (
-            n => bits_per_data + 1
+            n => bits_per_data + 2
         )
         port map (
             clk      => clk,
             reset    => bits_counter_reset,
             step     => bits_counter_step,
             value    => current_bit,
-            finished => tx_done
+            finished => done
         );
 
 end architecture behav;

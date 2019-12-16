@@ -90,10 +90,12 @@ begin
                 data <= std_logic_vector(selection);
                 if ((chunk_index /= 2 * num_chunks - 1 and chunk_step_mask = '1') or item_step_mask = '1')
                     and started = '1' then
-
                     data_ready_delay <= '1';
                 else
                     data_ready_delay <= '0';
+                end if;
+                if start = '1' then
+                    data_ready_delay <= '1';
                 end if;
                 data_ready <= data_ready_delay;
             end if;

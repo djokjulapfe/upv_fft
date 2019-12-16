@@ -15,7 +15,7 @@ architecture testbench of uart_tx_tb is
     signal tx_in    : std_logic_vector(8 - 1 downto 0);
     signal tx_start : std_logic;
     signal tx_out   : std_logic;
-    signal tx_done  : std_logic;
+    signal done     : std_logic;
 
     constant clk_period : time := 10 ns;
 
@@ -50,7 +50,7 @@ begin
             tx_in    => tx_in,
             tx_start => tx_start,
             tx_out   => tx_out,
-            tx_done  => tx_done
+            done     => done
         );
 
 end architecture testbench;

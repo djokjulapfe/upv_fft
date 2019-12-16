@@ -89,11 +89,11 @@ begin
     begin
         if rising_edge(clk) then
             if reset = '1' then
-                sample_clk        <= '0';
+                sample_clk        <= '1';
                 bits_counter_step <= '0';
             else
                 bits_counter_step <= '0';
-                if sample_cnt_finished = '1' then
+                if sample_cnt_finished = '1' or rx_start = '1' then
                     sample_clk <= not sample_clk;
                     if sample_clk = '0' then
                         bits_counter_step <= '1';
@@ -110,7 +110,7 @@ begin
                 input_buffer <= (others => '0');
             else
                 if bits_counter_step = '1' and current_bit /= 0 then
-                    input_buffer(current_chunk * bits_per_chunk + current_bit - 1) <= pin_in;
+                    input_buffer((max_chunk_count - current_chunk) * bits_per_chunk - current_bit) <= pin_in;
                 end if;
             end if;
         end if;
